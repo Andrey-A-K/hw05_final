@@ -34,19 +34,19 @@ class CacheTests(TestCase):
     def test_new_post_creates_new_post(self):
         """Главная страница кэширует отображаемую информацию """
         response = self.guest_client.get(reverse('posts:posts_index'))
-        """ Добавляем 2й пост"""
+        # Добавляем 2й пост
         self.new_post = Post.objects.create(
             text='Тестовая заметка 2',
             author=self.author,
             group=self.group
         )
-        """ проверяем, что после добавления новгого поста """
-        """ нам отдаются кешированные данные с его отсутствием """
+        # проверяем, что после добавления новгого поста
+        # нам отдаются кешированные данные с его отсутствием
         response_2 = self.guest_client.get(reverse('posts:posts_index'))
         self.assertEqual(response.content, response_2.content)
-        """ очищаем кеш """
+        # очищаем кеш
         cache.clear()
-        """ Сравниваем что после добавления"""
-        """ поста новые данные не равны старым"""
+        # Сравниваем что после добавления поста
+        # новые данные не равны старым
         response_3 = self.guest_client.get(reverse('posts:posts_index'))
         self.assertNotEqual(response.content, response_3.content)

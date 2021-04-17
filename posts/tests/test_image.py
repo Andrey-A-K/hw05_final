@@ -34,6 +34,19 @@ class PostCreateFormTests(TestCase):
             content=cls.small_gif,
             content_type='image/gif'
         )
+        cls.small_txt = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        cls.uploaded_txt = SimpleUploadedFile(
+            name='text.txt',
+            content=cls.small_txt,
+            content_type='text/plain'
+        )
         # Создаем пользователя
         cls.user = User.objects.create_user(username='AA')
         # Создаем группу
@@ -92,3 +105,33 @@ class PostCreateFormTests(TestCase):
                     'post_id': self.post.id}))
         post = Post.objects.last()
         self.assertTrue(response, post.image)
+
+    def test_canot_upload_non_image(self):
+        """ нельзя загрузить другой файл, кроме изображения """
+        errors = ("Формат файлов 'txt' не поддерживается. Поддерживаемые "
+                  "форматы файлов: 'bmp, dib, gif, tif, tiff, jfif, jpe, "
+                  "jpg, jpeg, pbm, pgm, ppm, pnm, png, apng, blp, bufr, "
+                  "cur, pcx, dcx, dds, ps, eps, fit, fits, fli, flc, ftc, "
+                  "ftu, gbr, grib, h5, hdf, jp2, j2k, jpc, jpf, jpx, j2c, "
+                  "icns, ico, im, iim, mpg, mpeg, mpo, msp, palm, pcd, "
+                  "pdf, pxr, psd, bw, rgb, rgba, sgi, ras, tga, icb, vda, "
+                  "vst, webp, wmf, emf, xbm, xpm'.")
+        form_data = {
+            'text': 'Тест',
+            'image': self.uploaded_txt
+        }
+        response = self.authorized_client.post(
+            reverse('posts:new_post'),
+            data=form_data,
+            follow=True
+        )
+        # response = self.client.post(reverse('post_edit',
+        #                              kwargs={
+        #                                  'username': self.user.username,
+        #                                  'post_id': self.post.pk}),
+        #                      {'image': img,
+        #                       'text': 'edited text with an image'})
+        self.assertFormError(response,
+                             form='form',
+                             field='image',
+                             errors=errors)

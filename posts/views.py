@@ -38,7 +38,6 @@ def new_post(request):
         post.author = request.user
         post.save()
         return redirect('posts:posts_index')
-    form = PostForm()
     return render(request, 'posts/new_post.html', {'form': form})
 
 
@@ -122,14 +121,14 @@ def add_comment(request, username, post_id):
     comments = post.comments.all()
 
     form = CommentForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            new_comment = form.save(commit=False)
-            new_comment.author = request.user
-            new_comment.post = post
-            new_comment.save()
-            return redirect('posts:post', username=username,
-                            post_id=post_id)
+    if request.method == 'POST' and form.is_valid():
+        new_comment = form.save(commit=False)
+        new_comment.author = request.user
+        new_comment.post = post
+        new_comment.save()
+        return redirect('posts:post',
+                        username=username,
+                        post_id=post_id)
 
     return render(request, 'post.html',
                   {'post': post,

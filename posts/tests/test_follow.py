@@ -44,6 +44,8 @@ class FollowTests(TestCase):
                          kwargs={'username': self.user_2.username})
         self.authorized_client.get(follow, follow=True)
         self.assertEqual(Follow.objects.all().count(), 1)
+
+    def test_unfollow(self):
         """ а после отписки он исчезнет """
         unfollow = reverse('posts:profile_unfollow',
                            kwargs={'username': self.user_2.username})
