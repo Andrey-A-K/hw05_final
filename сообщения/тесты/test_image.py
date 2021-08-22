@@ -125,13 +125,4 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        # response = self.client.post(reverse('post_edit',
-        #                              kwargs={
-        #                                  'username': self.user.username,
-        #                                  'post_id': self.post.pk}),
-        #                      {'image': img,
-        #                       'text': 'edited text with an image'})
-        self.assertFormError(response,
-                             form='form',
-                             field='image',
-                             errors=errors)
+        
